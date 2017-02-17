@@ -9,7 +9,10 @@ public class Constants {
 	
 	
 	
-	public final static String VER = "https://1-dot-setmorehub.appspot.com/test";
+	public final static String READ = "https://1-dot-setmorehub.appspot.com/read";
+	public final static String SAVE = "https://1-dot-setmorehub.appspot.com/save";
+	
+	
 	
 	
 }

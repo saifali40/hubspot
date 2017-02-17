@@ -17,16 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.appengine.repackaged.com.google.protobuf.TextFormat.ParseException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-
-
-
-//2805283,
-//2813920   2819905
 
 @Controller
 @RequestMapping("")
@@ -80,9 +72,23 @@ public class ControllerClass {
 		JSONObject json_access_token = null;
 		json_access_token = (JSONObject) parser.parse(response);
 		String access_token = (String) json_access_token.get("access_token");
-		String refresh_token = (String) json_access_token.get("refresh_token");
 		
-		return access_token+" access token and refresh token "+refresh_token;
+		URL obj1 = new URL("https://api.hubapi.com/contacts/v1/lists/all/contacts/all?");
+		HttpURLConnection conn = (HttpURLConnection) obj1.openConnection();
+		
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Authorization","Bearer "+access_token);
+		conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded;charset=utf-8");
+		BufferedReader in1 = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String inputLine1;
+		String responsee = "";
+		while ((inputLine1 = in1.readLine()) != null) {
+			responsee += inputLine1;
+		}
+		in1.close();
+
+		return responsee;
 	}
+	
 	
 }

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -101,7 +102,7 @@ public class ControllerClass {
 	@RequestMapping("/save")
 	@ResponseBody
 	public String save(@RequestParam(value = "code",required=false) String code, HttpServletRequest req,
-			HttpServletResponse resp,HttpSession session) throws IOException,NullPointerException, Exception{
+			HttpServletResponse resp,HttpSession session) throws IOException,NullPointerException, Exception,IllegalStateException{
 		
 		String url 				= 	"https://api.hubapi.com/oauth/v1/token?";
 		URL obj 				= 	new URL(url);
@@ -136,61 +137,46 @@ public class ControllerClass {
 		json_access_token = (JSONObject) parser.parse(response);
 		String access_token = (String) json_access_token.get("access_token");
 		
-
 		URL obj1 = new URL("https://api.hubapi.com/contacts/v1/contact/?");
 		HttpURLConnection conn = (HttpURLConnection) obj1.openConnection();
-		conn.setRequestProperty("Authorization","Bearer "+access_token);
-		conn.setRequestProperty("Content-Type", "application/json");
+		
 		conn.setRequestMethod("POST");
+		conn.setRequestProperty("Authorization","Bearer "+access_token);
+		conn.setRequestProperty("Content-Type","application/json");
 		
-		JSONObject out=new JSONObject();
-		JSONObject in1=new JSONObject();
+		JSONObject outer = new JSONObject();
+		JSONObject inner = new JSONObject();
+		JSONArray jarr = new JSONArray();
 		
-		JSONArray arr = new JSONArray();  
 		
-		Map mapA = new HashMap();
-
-		mapA.put("property", "email");
-		mapA.put("value", "testingapis@hubspot.com");
+		inner.put("property","email");
+		inner.put("value","testingapis@hubspot.com");
 		
-		in1.putAll(mapA);
-		arr.put(in1);
-		out.put("properties",arr);
+		jarr.put(inner);
 		
-		System.out.print(out);    
-        
-		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		wr.write(out.toString());
+		outer.put("properties",jarr);
+		
+		conn.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+		wr.writeBytes(outer.toString());
 		wr.flush();
-		
-		
+		wr.close();
 
-		return conn.getResponseMessage()+" --- () --- " + access_token;
+
+		BufferedReader in1 = new BufferedReader(
+		        new InputStreamReader(conn.getInputStream()));
+		String inputLine1;
+		StringBuffer response1 = new StringBuffer();
+
+		while ((inputLine1 = in1.readLine()) != null) {
+			response1.append(inputLine1);
+		}
+		in1.close();
+
+		return access_token+" --()-- "+response1+" --()-- "+conn.getResponseMessage();
 	}
 	
 	
 	
-	@RequestMapping("/test")
-	@ResponseBody
-	public String test() throws ParseException, JSONException,ClassCastException{
-		
-		
-		JSONObject out=new JSONObject();
-		JSONObject in=new JSONObject();
-		
-		JSONArray arr = new JSONArray();  
-		
-		Map mapA = new HashMap();
-
-		mapA.put("property", "email");
-		mapA.put("value", "testingapis@hubspot.com");
-		
-		in.putAll(mapA);
-		arr.put(in);
-		out.put("properties",arr);
-		
-		System.out.print(out);    
-        return out.toString();
-	}
 	
 }

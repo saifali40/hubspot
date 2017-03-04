@@ -8,11 +8,6 @@ public class Constants {
 	public final static String ClientS 		= "94acb3e4-c420-4f7b-937f-1f2278c870e1";
 	
 	
-	
-	public final static String READ = "https://1-dot-setmorehub.appspot.com/read";
-	public final static String SAVE = "https://1-dot-setmorehub.appspot.com/save";
-	
-	
-	
+	public final static String TEST = "https://1-dot-setmorehub.appspot.com/test";
 	
 }
